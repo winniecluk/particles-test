@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo Particle System</title>
+  <link rel="stylesheet" type="text/css" href="styles/style.css">
+</head>
+<body>
+  <div>
+    <canvas id="canvas"></canvas>
+  </div>
+  <div>
+    <button id="start">One</button>
+  </div>
+  <div>
+    <button id="stream">Stream</button>
+  </div>
+  <div class="space">
+  </div>
+  <div>
+    <strong>Churn:</strong>
+  </div>
+  <div>
+    <input type="range" min="0" max="100" step="1" onchange="particleSystem.start.updateCount(this.value)">
+  </div>
+  <div>
+    <input id="churnbox" type="text" disabled>%
+  </div>
+
+  <script type="text/javascript" src="scripts/Particle.js"></script>
+  <script type="text/javascript" src="scripts/canvas.js"></script>
+  <script type="text/javascript">
+    particleSystem.start.init();
+    particleSystem.start.go();
+  </script>
+</body>
+</html>

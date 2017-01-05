@@ -1,0 +1,12 @@
+#canvas {
+  border: 1px solid black;
+}
+
+.space {
+  padding: 10px;
+}
+
+#churnbox {
+  text-align: center;
+  width: 30px;
+}
