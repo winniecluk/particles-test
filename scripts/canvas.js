@@ -2,6 +2,13 @@
 
 (function(){
 
+// financial model variables
+  var monthlySpendValue = 0;
+  var cpmValue = 0;
+  var totalWebVisits = 0;
+  var monthlyActiveUsers = 0;
+  var conversionRate = 0;
+
 // particle system
   this.particleSystem = this.particleSystem || {};
 
@@ -18,10 +25,14 @@
 
   // hold the newly created particles
   var particles = [];
+  var lossParticles = [];
+  window.monthlyActiveArr = [];
+
   var canvas;
   var context;
   var lastTimestamp;
-  var count = 100;
+  var count = 0;
+  var lossCount = 0;
 
   // determined upon creating the context of canvas; remember it needs to be an obj
   var startPosition;
@@ -51,20 +62,69 @@
     particles.push(new particleSystem.Particle(startPosition, Math.random() + 2, 90 + Math.random() * 20 * coinFlip(), Math.random() * 100 + 20, 'blue', keep));
   }
 
+  function updateMonthlyArr(){
+    // if >, push
+    // if <, pop
+
+    function pushOne(){
+      if (monthlyActiveArr.length < monthlyActiveUsers){
+          monthlyActiveArr.push(1);
+          setTimeout(pushOne, 60);
+      } // close if
+    } // close pushOne
+
+    function popOne(){
+      if (monthlyActiveArr.length > monthlyActiveUsers){
+        monthlyActiveArr.pop();
+        setTimeout(popOne, 60);
+      }
+    }
+
+    pushOne();
+    popOne();
+  } // close fct
+
+
+  function createLossParticle(){
+    var keep = Math.random() > 0.5 ? true : false;
+    lossParticles.push(new particleSystem.Particle(startPosition, Math.random() + 1, 90 + Math.random() * 60 * coinFlip(), Math.random() * 100 + 20, 'red', keep))
+  }
+
   function stream(){
-    // this releases a stream of 100
-    // count can be released into global later
-    // var count = 100;
 
     function releaseOne(){
-      createParticle();
-      count--;
       if (count > 0){
+        createParticle();
+        count--;
         setTimeout(releaseOne, 60);
       }
     } // close releaseOne
     releaseOne();
+  } // close stream
+
+  function lossStream(){
+    if (lossCount > 0){
+      createLossParticle();
+      lossCount--;
+      setTimeout(lossStream, 60);
+    }
   }
+
+  function drawWater(){
+    // particles = [];
+    // setTimeout(function(){
+      for (var i = 0; i < monthlyActiveArr.length; i++){
+        context.fillStyle = 'blue';
+        // startPosition.y + 180 - i: since it draws from startposition down, you have to slowly move the rectangle startposition down
+        // var scalePercent = Math.floor(i / 8);
+        context.fillRect(startPosition.x - 60, startPosition.y + 180 - i, 120, i);
+        // startPosition.y + 210 - i for -30 + i height
+        // console.log('drawWater working');
+        // height needs to reflect current
+        // maybe take snapshot of length here and then clear the particles array somewhere?
+      }
+    // }, 1000);
+  } // this closes drawWater function
 
 // set context, draw the appearance of each particle
   function draw(){
@@ -86,12 +146,23 @@
       } // closes if statement for particle life
     }) // closes particle loop
 
-    // draw bigger and bigger blue rectangle inside glass
-      for (var i = 30; i < particles.length; i++){
-        context.fillStyle = 'blue';
-        context.fillRect(startPosition.x - 60, startPosition.y + 210 - i, 120, -30 + i);
-        // startPosition.y + 210 - i for -30 + i height
+// draw particles in the lossParticles array
+    lossParticles.forEach(function(lossParticle){
+      if (lossParticle.life > 0){
+        context.fillStyle = lossParticle.color;
+        context.beginPath();
+        // circle: x, y, radius, startAng, endAng, anticlockwise Bool
+        context.arc(lossParticle.position.x, lossParticle.position.y + 180, 5, 0, Math.PI * 2);
+        context.closePath();
+        context.fill();
       }
+    })
+
+
+    // draw bigger and bigger blue rectangle inside glass
+    drawWater();
+
+
 
     // if (particles.length > 30){
     //     context.fillStyle = 'blue';
@@ -109,6 +180,15 @@
     var size = 10;
     context.fillRect(startPosition.x - size / 2, startPosition.y - size / 2 + size, size, size);
 
+  // draw the second emitter near the bottom
+    context.fillStyle = 'rgba(255, 255, 255, 0)'
+    context.fillRect(startPosition.x - size / 2, startPosition.y + 170, size, size);
+
+    // startPosition = {
+    //   x: canvas.width / 2,
+    //   y: canvas.height * 1/3
+    // };
+
     // draw glass
     context.strokeRect(startPosition.x - 60, startPosition.y + 40, 120, 140)
 
@@ -125,6 +205,11 @@
     // this changes the position property of the particles in the array
     for (var i = 0; i < particles.length; i++){
       particles[i].update(dt);
+    }
+
+    // update loss particles
+    for (var i = 0; i < lossParticles.length; i++){
+      lossParticles[i].update(dt);
     }
 
     // now we need to draw that updated particle
@@ -149,13 +234,85 @@
 
     var streamButton = document.querySelector('#stream');
     streamButton.addEventListener('click', stream, false);
+
+    var monthlySpendBox = document.querySelector('#monthlySpendBox');
+
+    var cpmBox = document.querySelector('#cpmBox');
+
+    var webVisitsBox = document.querySelector('#webVisitsBox');
+
+    var conversionBox = document.querySelector('#conversionBox');
+
+    var monthlyActiveBox = document.querySelector('#monthlyActiveBox');
+
+    var churnBox = document.querySelector('#churnbox');
+
+    var userLossBox = document.querySelector('#userLossBox');
+
     }, // this closes init
 
-    updateCount: function(value){
+    monthlySpend: function(value){
+      // set box display
+      monthlySpendBox.value = value;
+      // set the value for other fcts
+      monthlySpendValue = value;
+      // equations to run every time
+      totalWebVisits = monthlySpendValue * cpmValue;
+      monthlyActiveUsers = Math.round(totalWebVisits * (conversionRate * 0.01));
+      // set result box display
+      webVisitsBox.value = totalWebVisits;
+      monthlyActiveBox.value = monthlyActiveUsers;
+      // set number of particles
+      count = monthlyActiveUsers;
+      stream();
+      updateMonthlyArr();
+    }, // this closes monthly spend
+
+    cpm: function(value){
+      cpmBox.value = value;
+      cpmValue = value;
+
+      totalWebVisits = monthlySpendValue * cpmValue;
+      monthlyActiveUsers = Math.round(totalWebVisits * (conversionRate * 0.01));
+
+      webVisitsBox.value = totalWebVisits;
+      monthlyActiveBox.value = monthlyActiveUsers;
+
+      count = monthlyActiveUsers;
+      stream();
+      updateMonthlyArr();
+    }, // this closes cpm
+
+    conversion: function(value){
+      conversionRate = value;
+      monthlyActiveUsers = Math.round(totalWebVisits * (value * 0.01));
+
+      conversionBox.value = value;
+      monthlyActiveBox.value = monthlyActiveUsers;
+
+      count = monthlyActiveUsers;
+      stream();
+      updateMonthlyArr();
+    },
+
+    churn: function(value){
+      // issue to be resolved later
       var churnBox = document.querySelector('#churnbox');
       churnBox.value = value;
-      count = value;
-    }, // this closes updateCount
+
+      lossCount = (0.01 * value) * ((monthlySpendValue * cpmValue) * (conversionRate * 0.01));
+
+      monthlyActiveUsers = ((monthlySpendValue * cpmValue) * (conversionRate * 0.01)) - ((0.01 * value) * ((monthlySpendValue * cpmValue) * (conversionRate * 0.01)));
+
+      console.log('this is the new MAU ' + monthlyActiveUsers);
+
+      monthlyActiveBox.value = monthlyActiveUsers;
+
+      userLossBox.value = lossCount;
+
+      lossStream();
+      updateMonthlyArr();
+    }, // this closes updateCount -- will not need later
 
     go: function(){
       play(new Date().getTime());

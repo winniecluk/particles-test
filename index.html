@@ -15,16 +15,78 @@
   <div>
     <button id="stream">Stream</button>
   </div>
+
   <div class="space">
   </div>
+
+  <div>
+    <strong>Monthly Spend:</strong>
+  </div>
+  <div>
+    <input type="range" min="0" max="1000" step="1" onchange="particleSystem.start.monthlySpend(this.value)">
+  </div>
+  <div>
+    $<input id="monthlySpendBox" type="text" disabled>
+  </div>
+
+  <div class="space">
+  </div>
+
+  <div>
+    <strong>Average CPM:</strong>
+  </div>
+  <div>
+    <input type="range" min="0" max="100" step="1" onchange="particleSystem.start.cpm(this.value)">
+  </div>
+  <div>
+    $<input id="cpmBox" type="text" disabled>
+  </div>
+
+  <div class="space">
+  </div>
+
+  <div>
+    Total web visits: <input id="webVisitsBox" type="text" disabled>
+  </div>
+
+  <div class="space">
+  </div>
+
+  <div>
+    <strong>Conversion Rate:</strong>
+  </div>
+  <div>
+    <input type="range" min="0" max="100" step="1" onchange="particleSystem.start.conversion(this.value)">
+  </div>
+  <div>
+    <input id="conversionBox" type="text" disabled>%
+  </div>
+
+  <div class="space">
+  </div>
+
+  <div>
+    Monthly active users: <input id="monthlyActiveBox" type="text" disabled>
+  </div>
+
+  <div class="space">
+  </div>
+
   <div>
     <strong>Churn:</strong>
   </div>
   <div>
-    <input type="range" min="0" max="100" step="1" onchange="particleSystem.start.updateCount(this.value)">
+    <input type="range" min="0" max="100" step="1" onchange="particleSystem.start.churn(this.value)">
   </div>
   <div>
     <input id="churnbox" type="text" disabled>%
+  </div>
+
+  <div class="space">
+  </div>
+
+  <div>
+    User loss: <input id="userLossBox" type="text" disabled>
   </div>
 
   <script type="text/javascript" src="scripts/Particle.js"></script>

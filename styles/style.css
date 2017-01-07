@@ -6,7 +6,7 @@
   padding: 10px;
 }
 
-#churnbox {
+input[type=text] {
   text-align: center;
-  width: 30px;
+  width: 40px;
 }
