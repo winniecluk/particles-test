@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  background: #000;
+  min-width: 800px;
+}
+
+rect {
+  fill: none;
+  pointer-events: all;
+}
+
+circle {
+  fill: blue;
+  stroke-width: 2.5px;
+}
